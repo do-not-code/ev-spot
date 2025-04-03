@@ -1,0 +1,17 @@
+{
+    "name": "EV Spot",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+    "icons": [
+        {
+            "src": "ev-spot-192x192.png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "ev-spot-512x512.png",
+            "sizes": "512x512"
+        }
+    ]
+}

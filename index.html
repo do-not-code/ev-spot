@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="manifest" href="manifest.json" />
+        <link rel="stylesheet" href="style.css" />
+        <script src="script.js"></script>
+    </head>
+    <body>
+        <div id="page">
+            <svg width="40vw" height="40vh" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <style>
+                    .spinner { animation:spinner_animation 1.6s linear infinite; animation-delay:-1.6s }
+                    .spinner_delay { animation-delay:-1s }
+                    @keyframes spinner_animation {
+                        12.5% { x:13px; y: 1px }
+                        25%   { x:13px; y: 1px }
+                        37.5% { x:13px; y:13px }
+                        50%   { x:13px; y:13px }
+                        62.5% { x: 1px; y:13px }
+                        75%   { x: 1px; y:13px }
+                        87.5% { x: 1px; y: 1px }
+                    }
+                </style>
+                <rect class="spinner" x="1" y="1" rx="1" width="10" height="10" fill="#aebf1e"/>
+                <rect class="spinner spinner_delay" x="1" y="1" rx="1" width="10" height="10" fill="#5d176a"/>
+            </svg>
+        </div>
+    </body>
+</html>
