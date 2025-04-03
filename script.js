@@ -1,4 +1,19 @@
-const GRID_POSITION = {
+async function fetchJSON(url, body) {
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(body)
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Fetch error:", error);
+        return null;
+    }
+}
+
+const EVSE_ID_GRID_POSITION = {
     "NLEVBEEVBP2444412*2429112": [0, 0],
     "NLEVBEEVBP2444412*2429260": [1, 0],
     "NLEVBEEVBP2444412*2429171": [0, 1], // confirmed
@@ -11,15 +26,15 @@ const GRID_POSITION = {
     "NLEVBEEVBP2444412*2429125": [1, 4]
 };
 
-function updateStatus(data) {
+function updateStatus(evses) {
     const svgNS = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("width", "80vw");
     svg.setAttribute("height", "80vh");
     svg.setAttribute("viewBox", "0 0 24 60");
-    data.data[0].evses.forEach(evse => {
+    evses.forEach(evse => {
         if (evse.evseId !== undefined) {
-            const [x, y] = GRID_POSITION[evse.evseId];
+            const [x, y] = EVSE_ID_GRID_POSITION[evse.evseId];
             const rect = document.createElementNS(svgNS, "rect");
             rect.setAttribute("x", x * 12 + 1);
             rect.setAttribute("y", y * 12 + 1);
@@ -35,21 +50,31 @@ function updateStatus(data) {
     document.getElementById("page").replaceChildren(svg);
 }
 
-const ID = "67c1a6581da267ce0513e042";
-const URL = "https://api.e-flux.nl/1/map/locations";
+const LATITUDE = 52.290632;
+const LONGITUDE = 4.700786;
 
 async function refresh() {
-    try {
-        const response = await fetch(URL, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ids: [ID]})
-        });
-        const data = await response.json();
-        updateStatus(data);
-    } catch (error) {
-        console.error("Fetch error:", error);
-    }
+    var search = await fetchJSON(
+        "https://api.road.io/1/map/search",
+        {
+            "gridPrecision": 8,
+            "bbox": {
+                "nwLat": LATITUDE,
+                "nwLng": LONGITUDE,
+                "seLat": LATITUDE,
+                "seLng": LONGITUDE
+            }
+        }
+    );
+    const ids = search.data[0].ids;
+    var locations = await fetchJSON(
+        "https://api.road.io/1/map/locations",
+        {
+            "ids": ids
+        }
+    );
+    const evses = locations.data[0].evses;
+    updateStatus(evses);
 }
 
 window.addEventListener("load", refresh);
