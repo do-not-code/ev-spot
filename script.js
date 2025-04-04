@@ -14,16 +14,11 @@ async function fetchJSON(url, body) {
 }
 
 const EVSE_ID_GRID_POSITION = {
-    "NLEVBEEVBP2444412*2429112": [0, 0],
-    "NLEVBEEVBP2444412*2429260": [1, 0],
-    "NLEVBEEVBP2444412*2429171": [0, 1], // confirmed
-    "NLEVBEEVBP2444412*2429239": [1, 1],
-    "NLEVBEEVBP2444412*2429255": [0, 2],
-    "NLEVBEEVBP2444412*2429088": [1, 2],
-    "NLEVBEEVBP2444412*2429124": [0, 3],
-    "NLEVBEEVBP2444412*2429010": [1, 3],
-    "NLEVBEEVBP2444412*2429105": [0, 4],
-    "NLEVBEEVBP2444412*2429125": [1, 4]
+    "NLEVBEEVBP2444412*2429255": [0,0], "NLEVBEEVBP2444412*2429010": [1,0],
+    "NLEVBEEVBP2444412*2429171": [0,1], "NLEVBEEVBP2444412*2429239": [1,1],
+    "NLEVBEEVBP2444412*2429112": [0,2], "NLEVBEEVBP2444412*2429105": [1,2],
+    "NLEVBEEVBP2444412*2429124": [0,3], "NLEVBEEVBP2444412*2429260": [1,3],
+    "NLEVBEEVBP2444412*2429088": [0,4], "NLEVBEEVBP2444412*2429125": [1,4]
 };
 
 function updateStatus(evses) {
@@ -33,7 +28,7 @@ function updateStatus(evses) {
     svg.setAttribute("height", "80vh");
     svg.setAttribute("viewBox", "0 0 24 60");
     evses.forEach(evse => {
-        if (evse.evseId !== undefined) {
+        if (evse.evseId in EVSE_ID_GRID_POSITION) {
             const [x, y] = EVSE_ID_GRID_POSITION[evse.evseId];
             const rect = document.createElementNS(svgNS, "rect");
             rect.setAttribute("x", x * 12 + 1);
