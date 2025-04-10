@@ -13,12 +13,15 @@ async function fetchJSON(url, body) {
     }
 }
 
+// NLEVBEEVBP2444412*2429171 = confirmed (0,1)
+// NLEVBEEVBP2444412*2429125 = confirmed (0,3)
+
 const EVSE_ID_GRID_POSITION = {
     "NLEVBEEVBP2444412*2429255": [0,0], "NLEVBEEVBP2444412*2429010": [1,0],
-    "NLEVBEEVBP2444412*2429171": [0,1], "NLEVBEEVBP2444412*2429239": [1,1],
+    "NLEVBEEVBP2444412*2429171": [0,1], "NLEVBEEVBP2444412*2429124": [1,1],
     "NLEVBEEVBP2444412*2429112": [0,2], "NLEVBEEVBP2444412*2429105": [1,2],
-    "NLEVBEEVBP2444412*2429124": [0,3], "NLEVBEEVBP2444412*2429260": [1,3],
-    "NLEVBEEVBP2444412*2429088": [0,4], "NLEVBEEVBP2444412*2429125": [1,4]
+    "NLEVBEEVBP2444412*2429125": [0,3], "NLEVBEEVBP2444412*2429260": [1,3],
+    "NLEVBEEVBP2444412*2429088": [0,4], "NLEVBEEVBP2444412*2429239": [1,4]
 };
 
 function updateStatus(evses) {
@@ -27,9 +30,9 @@ function updateStatus(evses) {
     svg.setAttribute("width", "80vw");
     svg.setAttribute("height", "80vh");
     svg.setAttribute("viewBox", "0 0 24 60");
-    evses.forEach(evse => {
-        if (evse.evseId in EVSE_ID_GRID_POSITION) {
-            const [x, y] = EVSE_ID_GRID_POSITION[evse.evseId];
+    for (const i in evses) {
+        if (evses[i].evseId in EVSE_ID_GRID_POSITION) {
+            const [x, y] = EVSE_ID_GRID_POSITION[evses[i].evseId];
             const rect = document.createElementNS(svgNS, "rect");
             rect.setAttribute("x", x * 12 + 1);
             rect.setAttribute("y", y * 12 + 1);
@@ -37,38 +40,51 @@ function updateStatus(evses) {
             rect.setAttribute("height", 10);
             rect.setAttribute("rx", 1);
             rect.setAttribute("ry", 1);
-            rect.setAttribute("fill", evse.status === "AVAILABLE" ? "green" : "red");
+            rect.setAttribute("fill", evses[i].status === "AVAILABLE" ? "green" : "red");
             svg.appendChild(rect);
         }
-    });
-
+    }
     document.getElementById("page").replaceChildren(svg);
 }
 
-const LATITUDE = 52.290632;
-const LONGITUDE = 4.700786;
+const LATITUDE = 52.29063197504729;
+const LONGITUDE = 4.700785959139466;
+const MARGIN = 0;
 
 async function refresh() {
+    // get location ids
     var search = await fetchJSON(
         "https://api.road.io/1/map/search",
         {
             "gridPrecision": 8,
             "bbox": {
-                "nwLat": LATITUDE,
-                "nwLng": LONGITUDE,
-                "seLat": LATITUDE,
-                "seLng": LONGITUDE
+                "nwLat": LATITUDE + MARGIN,
+                "nwLng": LONGITUDE - MARGIN,
+                "seLat": LATITUDE - MARGIN,
+                "seLng": LONGITUDE + MARGIN
             }
         }
     );
-    const ids = search.data[0].ids;
-    var locations = await fetchJSON(
-        "https://api.road.io/1/map/locations",
-        {
-            "ids": ids
+    var evses = [];
+    for (const i in search.data) {
+        const ids = search.data[i].ids;
+        // get status for each location id
+        var locations = await fetchJSON(
+            "https://api.road.io/1/map/locations",
+            {
+                "ids": ids
+            }
+        );
+        // aggregate status for each evse
+        for (const j in locations.data) {
+            for (const k in locations.data[j].evses) {
+                evses.push({
+                    "evseId": locations.data[j].evses[k].evseId,
+                    "status": locations.data[j].evses[k].status
+                });
+            }
         }
-    );
-    const evses = locations.data[0].evses;
+    }
     updateStatus(evses);
 }
 
