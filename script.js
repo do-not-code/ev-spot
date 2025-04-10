@@ -42,7 +42,8 @@ function updateStatus(evses) {
             rect.setAttribute("height", 10);
             rect.setAttribute("rx", 1);
             rect.setAttribute("ry", 1);
-            rect.setAttribute("fill", evses[i].status === "AVAILABLE" ? "green" : "red");
+            // rect.setAttribute("fill", evses[i].status === "AVAILABLE" ? "green" : "red");
+            rect.setAttribute("fill", evses[i].status === "AVAILABLE" ? "green" : evses[i].status === "CHARGING" ? "red" : "orange");
             svg.appendChild(rect);
         }
     }
